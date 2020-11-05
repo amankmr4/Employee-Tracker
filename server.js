@@ -36,5 +36,30 @@ function startprompt() {
                     "View Employees",
                     "Update employee roles"]
             },
-        ])
+        ]).then(function (answer) {
+            console.log(answer)
+            switch (answer) {
+                case "Add Department":
+                    console.log("Add Department");
+                    break;
+                case "Add Role":
+                    console.log("Add Role");
+                    break;
+                case "Add Employee":
+                    console.log("Add Employee");
+                    break;
+                case "View Departments":
+                    console.log("View Departments");
+                    break;
+                case "View Roles":
+                    console.log("View Roles");
+                    break;
+                case "View Employees":
+                    console.log("View Employees");
+                    break;
+                case "Update employee roles":
+                    console.log("Update employee roles");
+                    break;
+            }
+        })
 }
