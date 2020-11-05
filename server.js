@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var consoletable = require("console.table");
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -38,9 +39,9 @@ function startprompt() {
             },
         ]).then(function (answer) {
             console.log(answer)
-            switch (answer) {
+            switch (answer.choices) {
                 case "Add Department":
-                    console.log("Add Department");
+                    addDepartment();
                     break;
                 case "Add Role":
                     console.log("Add Role");
@@ -63,3 +64,19 @@ function startprompt() {
             }
         })
 }
+
+function addDepartment() {
+    inquirer.prompt([
+        {
+            name: "departmentName",
+            type: "input",
+            message: "Please enter the departments name?",
+        }
+    ]).then(function (answer) {
+        var query = "INSERT INTO department (name) VALUES (?)";
+        connection.query(query, answer.departmentName, function (err, res) {
+            if (err) throw err;
+            console.log(res)
+        })
+    })
+};
