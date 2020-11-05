@@ -18,6 +18,6 @@ CREATE TABLE employee (
     first_name VARCHAR(30) DEFAULT NULL,
     last_name VARCHAR(30) DEFAULT NULL,
     role_id INT NOT NULL,
-    manager INT DEFAULT null,
+    manager_id INT DEFAULT null,
     PRIMARY KEY (id)
 );
