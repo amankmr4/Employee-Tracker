@@ -47,7 +47,7 @@ function startprompt() {
                     addRole();
                     break;
                 case "Add Employee":
-                    console.log("Add Employee");
+                    addEmployee();
                     break;
                 case "View Departments":
                     console.log("View Departments");
@@ -105,4 +105,36 @@ function addRole() {
             console.log(res)
         })
     })
+}
+
+function addEmployee() {
+    inquirer.prompt([
+        {
+            name: "firstname",
+            type: "input",
+            message: "Please enter the first name?",
+        },
+        {
+            name: "lastname",
+            type: "input",
+            message: "Please enter the last name?",
+        },
+        {
+            name: "rollID",
+            type: "input",
+            message: "Please enter the roll ID?",
+        }, {
+            name: "managersID",
+            type: "input",
+            message: "Please enter the managers' ID?",
+        },
+
+    ]).then(function (answer) {
+        var query = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)";
+        connection.query(query, [[answer.firstname, answer.lastname, answer.rollID, answer.managersID]], function (err, res) {
+            if (err) throw err;
+            console.log(res)
+        })
+    })
+
 }
