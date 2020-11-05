@@ -44,7 +44,7 @@ function startprompt() {
                     addDepartment();
                     break;
                 case "Add Role":
-                    console.log("Add Role");
+                    addRole();
                     break;
                 case "Add Employee":
                     console.log("Add Employee");
@@ -80,3 +80,29 @@ function addDepartment() {
         })
     })
 };
+
+function addRole() {
+    inquirer.prompt([
+        {
+            name: "role",
+            type: "input",
+            message: "Please enter the role?",
+        },
+        {
+            name: "salary",
+            type: "input",
+            message: "Please enter the salary?",
+        },
+        {
+            name: "departmentID",
+            type: "input",
+            message: "Please enter the departments id number?",
+        }
+    ]).then(function (answer) {
+        var query = "INSERT INTO roles (title, salary, department_id) VALUES (?)";
+        connection.query(query, [[answer.role, answer.salary, answer.departmentID]], function (err, res) {
+            if (err) throw err;
+            console.log(res)
+        })
+    })
+}
