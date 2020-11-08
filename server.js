@@ -1,6 +1,8 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-var consoletable = require("console.table");
+const cTable = require('console.table');
+
+var allSalary = []
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -53,13 +55,13 @@ function startprompt() {
                     console.log("View Departments");
                     break;
                 case "View Roles":
-                    console.log("View Roles");
+                    showRoles();
                     break;
                 case "View Employees":
-                    console.log("View Employees");
+                    showEmployees();
                     break;
                 case "Update employee roles":
-                    console.log("Update employee roles");
+                    updateRole();
                     break;
             }
         })
@@ -76,7 +78,7 @@ function addDepartment() {
         var query = "INSERT INTO department (name) VALUES (?)";
         connection.query(query, answer.departmentName, function (err, res) {
             if (err) throw err;
-            console.log(res)
+            startprompt()
         })
     })
 };
@@ -99,10 +101,12 @@ function addRole() {
             message: "Please enter the departments id number?",
         }
     ]).then(function (answer) {
+        allSalary.push(answer.salary)
+        console.log(allSalary)
         var query = "INSERT INTO roles (title, salary, department_id) VALUES (?)";
         connection.query(query, [[answer.role, answer.salary, answer.departmentID]], function (err, res) {
             if (err) throw err;
-            console.log(res)
+            startprompt()
         })
     })
 }
@@ -137,4 +141,72 @@ function addEmployee() {
         })
     })
 
+}
+
+function showDepartment() {
+    //this will need to show utilized budget where we need to add all users for that deparmtent salary and then add it all together
+    startprompt()
+}
+
+function showEmployees() {
+    var query = "SELECT employee.id, employee.first_name, employee.last_name, department.name ,roles.title, roles.salary FROM employee LEFT JOIN department ON employee.id = department.id LEFT JOIN roles ON employee.id = roles.id"
+    connection.query(query, function (err, res) {
+        if (err) throw err;
+        console.table(res)
+        startprompt()
+    })
+}
+
+function showRoles() {
+    var query = "SELECT roles.id, roles.title,department.name ,roles.salary FROM roles LEFT JOIN department ON roles.department_id = department.id";
+    connection.query(query, function (err, res) {
+        if (err) throw err;
+        console.table(res)
+        startprompt()
+    })
+
+}
+
+function updateRole() {
+
+
+
+    var query = `SELECT CONCAT (first_name," ",last_name) AS full_name,roles.title  FROM employee LEFT JOIN roles ON employee.role_id = roles.id`;
+
+
+
+    connection.query(query, function (err, res) {
+        if (err) throw err;
+
+        console.log(res)
+        inquirer.prompt([
+            {
+                name: 'employeeFullName',
+                type: 'list',
+                choices: function () {
+                    let choiceArray = res.map(choice => choice.full_name + ":" + choice.title);
+                    return choiceArray;
+                },
+                message: 'Select an employee to update their role:'
+            },
+            {
+                name: "newrole",
+                type: "input",
+                message: "Please enter the new role?",
+            },
+        ]).then(function (answer) {
+            let emSep = answer.employeeFullName.split(":")
+            let emTitle = emSep[1]
+            console.log(emTitle)
+
+            var query = `UPDATE roles SET title = (?) WHERE title = (?)`
+            connection.query(query, [[answer.newrole], [emTitle]], function (err, res) {
+                if (err) throw err;
+                console.log("ITS BEEN UPDATED");
+                startprompt();
+
+            })
+
+        })
+    })
 }
