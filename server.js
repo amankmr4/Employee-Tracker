@@ -22,8 +22,28 @@ var connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-    startprompt()
+    init()
 });
+
+function init() {
+
+    const description =
+        "This application architects and builds a solution for managing a company's employees using node, inquirer, and MySQL.";
+    console.log(
+        logo({
+            name: config.name,
+            font: "Big",
+            logoColor: "cyan",
+            borderColor: "magenta",
+        })
+            .emptyLine()
+            .right("version 1.0.0")
+            .emptyLine()
+            .center(description)
+            .render()
+    );
+    startprompt();
+}
 
 function startprompt() {
     inquirer
