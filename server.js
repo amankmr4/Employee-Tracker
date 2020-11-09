@@ -28,7 +28,7 @@ connection.connect(function (err) {
 function init() {
 
     const description =
-        "This application architects and builds a solution for managing a company's employees using node, inquirer, and MySQL.";
+        "This application assists end users to create a databse for thier employees";
     console.log(
         logo({
             name: config.name,
