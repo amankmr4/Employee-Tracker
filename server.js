@@ -1,6 +1,8 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 const cTable = require('console.table');
+const logo = require('asciiart-logo');
+const config = require("./package.json");
 
 var allSalary = []
 
@@ -20,7 +22,6 @@ var connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-    console.log("Hello world")
     startprompt()
 });
 
@@ -40,7 +41,6 @@ function startprompt() {
                     "Update employee roles"]
             },
         ]).then(function (answer) {
-            console.log(answer)
             switch (answer.choices) {
                 case "Add Department":
                     addDepartment();
@@ -52,7 +52,7 @@ function startprompt() {
                     addEmployee();
                     break;
                 case "View Departments":
-                    console.log("View Departments");
+                    showDepartment();
                     break;
                 case "View Roles":
                     showRoles();
@@ -102,7 +102,6 @@ function addRole() {
         }
     ]).then(function (answer) {
         allSalary.push(answer.salary)
-        console.log(allSalary)
         var query = "INSERT INTO roles (title, salary, department_id) VALUES (?)";
         connection.query(query, [[answer.role, answer.salary, answer.departmentID]], function (err, res) {
             if (err) throw err;
@@ -137,22 +136,30 @@ function addEmployee() {
         var query = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)";
         connection.query(query, [[answer.firstname, answer.lastname, answer.rollID, answer.managersID]], function (err, res) {
             if (err) throw err;
-            console.log(res)
+            startprompt()
         })
     })
 
 }
 
 function showDepartment() {
-    //this will need to show utilized budget where we need to add all users for that deparmtent salary and then add it all together
-    startprompt()
+    var query = "SELECT * FROM department"
+    connection.query(query, function (err, res) {
+        if (err) throw err;
+        console.log("\n" + "-----------------EMPLOYEE LIST------------------------" + "\n")
+        console.table(res)
+        console.log("\n" + "------------------------------------------------------" + "\n")
+        startprompt()
+    })
 }
 
 function showEmployees() {
     var query = "SELECT employee.id, employee.first_name, employee.last_name, department.name ,roles.title, roles.salary FROM employee LEFT JOIN department ON employee.id = department.id LEFT JOIN roles ON employee.id = roles.id"
     connection.query(query, function (err, res) {
         if (err) throw err;
+        console.log("\n" + "-----------------EMPLOYEE LIST------------------------" + "\n")
         console.table(res)
+        console.log("\n" + "------------------------------------------------------" + "\n")
         startprompt()
     })
 }
@@ -161,7 +168,9 @@ function showRoles() {
     var query = "SELECT roles.id, roles.title,department.name ,roles.salary FROM roles LEFT JOIN department ON roles.department_id = department.id";
     connection.query(query, function (err, res) {
         if (err) throw err;
+        console.log("\n" + "-----------------EMPLOYEE LIST------------------------" + "\n")
         console.table(res)
+        console.log("\n" + "------------------------------------------------------" + "\n")
         startprompt()
     })
 
@@ -178,7 +187,6 @@ function updateRole() {
     connection.query(query, function (err, res) {
         if (err) throw err;
 
-        console.log(res)
         inquirer.prompt([
             {
                 name: 'employeeFullName',
@@ -197,7 +205,6 @@ function updateRole() {
         ]).then(function (answer) {
             let emSep = answer.employeeFullName.split(":")
             let emTitle = emSep[1]
-            console.log(emTitle)
 
             var query = `UPDATE roles SET title = (?) WHERE title = (?)`
             connection.query(query, [[answer.newrole], [emTitle]], function (err, res) {
